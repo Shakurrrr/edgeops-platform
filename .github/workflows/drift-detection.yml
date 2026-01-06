@@ -1,0 +1,26 @@
+name: Terraform Drift Detection
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  drift-detection:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: infra/envs/dev
+        run: terraform init
+
+      - name: Terraform Plan (Drift Check)
+        working-directory: infra/envs/dev
+        run: terraform plan -detailed-exitcode
+        continue-on-error: true

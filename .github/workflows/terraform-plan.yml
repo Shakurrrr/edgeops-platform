@@ -1,0 +1,62 @@
+name: Terraform Plan (Dev)
+
+on:
+  pull_request:
+    paths:
+      - "infra/**"
+      - "policies/**"
+
+jobs:
+  terraform-plan:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      pull-requests: write
+
+    env:
+      AWS_REGION: us-east-1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        working-directory: infra/envs/dev
+        run: terraform init
+
+      - name: Terraform Format
+        working-directory: infra/envs/dev
+        run: terraform fmt -check
+
+      - name: Terraform Validate
+        working-directory: infra/envs/dev
+        run: terraform validate
+
+      - name: Terraform Plan
+        working-directory: infra/envs/dev
+        run: terraform plan -out=tfplan.binary
+
+      - name: Convert Plan to JSON
+        working-directory: infra/envs/dev
+        run: terraform show -json tfplan.binary > tfplan.json
+
+      - name: Install Conftest (OPA)
+        run: |
+          curl -L https://github.com/open-policy-agent/conftest/releases/download/v0.52.0/conftest_0.52.0_Linux_x86_64.tar.gz | tar xz
+          sudo mv conftest /usr/local/bin
+
+      - name: Run Policy Checks
+        working-directory: infra/envs/dev
+        run: conftest test tfplan.json -p ../../../policies/terraform
+
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-plan-dev
+          path: infra/envs/dev/tfplan.json
