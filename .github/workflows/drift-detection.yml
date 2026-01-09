@@ -9,13 +9,30 @@ jobs:
   drift-detection:
     runs-on: ubuntu-latest
 
-    # IMPORTANT: gives access to Environment-level secrets if you stored them there
+    # If your secrets are stored under Environment "dev", this is required.
     environment:
       name: dev
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Debug secrets presence (safe)
+        shell: bash
+        run: |
+          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
+            echo "AWS_ACCESS_KEY_ID is EMPTY"
+            exit 1
+          else
+            echo "AWS_ACCESS_KEY_ID is present"
+          fi
+
+          if [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
+            echo "AWS_SECRET_ACCESS_KEY is EMPTY"
+            exit 1
+          else
+            echo "AWS_SECRET_ACCESS_KEY is present"
+          fi
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
