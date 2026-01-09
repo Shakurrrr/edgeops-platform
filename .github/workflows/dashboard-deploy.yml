@@ -25,13 +25,12 @@ jobs:
         working-directory: apps/dashboard
         run: npm install
 
-      # Next.js 14+ with next.config.js output: "export"
-      # "next export" is removed, so build produces apps/dashboard/out automatically.
+      # Next.js static export happens via next.config.js (output: "export")
+      # next export is removed, so build produces apps/dashboard/out automatically.
       - name: Build (Static Export)
         working-directory: apps/dashboard
         run: npm run build
 
-      # Write frontend marker so the UI can display BLUE/GREEN automatically
       - name: Write frontend color marker
         run: |
           echo "{\"color\":\"${{ inputs.target }}\"}" > apps/dashboard/out/frontend.json
@@ -40,7 +39,8 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           aws-region: us-east-1
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
       - name: Sync to S3
         run: |
