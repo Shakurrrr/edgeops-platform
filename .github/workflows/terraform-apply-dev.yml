@@ -10,6 +10,7 @@ on:
 jobs:
   terraform-apply:
     runs-on: ubuntu-latest
+
     environment:
       name: dev
 
@@ -23,6 +24,9 @@ jobs:
           aws-region: us-east-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3

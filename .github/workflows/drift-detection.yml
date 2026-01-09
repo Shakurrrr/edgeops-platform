@@ -9,6 +9,10 @@ jobs:
   drift-detection:
     runs-on: ubuntu-latest
 
+    # IMPORTANT: gives access to Environment-level secrets if you stored them there
+    environment:
+      name: dev
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -19,6 +23,9 @@ jobs:
           aws-region: us-east-1
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
@@ -46,7 +53,7 @@ jobs:
             echo "No drift detected."
             exit 0
           elif [ "$code" = "2" ]; then
-            echo " Drift detected (plan exit code 2)."
+            echo "Drift detected (plan exit code 2)."
             exit 0
           else
             echo "Terraform plan failed (exit code $code)."
