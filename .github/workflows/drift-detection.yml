@@ -13,9 +13,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -23,11 +20,35 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
       - name: Terraform Init
         working-directory: infra/envs/dev
         run: terraform init
 
       - name: Terraform Plan (Drift Check)
+        id: drift
         working-directory: infra/envs/dev
-        run: terraform plan -detailed-exitcode
-        continue-on-error: true
+        shell: bash
+        run: |
+          set +e
+          terraform plan -detailed-exitcode -no-color
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Report result
+        shell: bash
+        run: |
+          code="${{ steps.drift.outputs.exit_code }}"
+          if [ "$code" = "0" ]; then
+            echo "No drift detected."
+            exit 0
+          elif [ "$code" = "2" ]; then
+            echo " Drift detected (plan exit code 2)."
+            exit 0
+          else
+            echo "Terraform plan failed (exit code $code)."
+            exit 1
+          fi
