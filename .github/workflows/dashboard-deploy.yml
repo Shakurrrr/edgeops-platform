@@ -1,0 +1,51 @@
+name: Deploy Dashboard (Blue/Green)
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Deploy target color (blue or green)"
+        required: true
+        default: "green"
+
+jobs:
+  deploy-dashboard:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        working-directory: apps/dashboard
+        run: npm install
+
+      # Next.js 14+ with next.config.js output: "export"
+      # "next export" is removed, so build produces apps/dashboard/out automatically.
+      - name: Build (Static Export)
+        working-directory: apps/dashboard
+        run: npm run build
+
+      # Write frontend marker so the UI can display BLUE/GREEN automatically
+      - name: Write frontend color marker
+        run: |
+          echo "{\"color\":\"${{ inputs.target }}\"}" > apps/dashboard/out/frontend.json
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+
+      - name: Sync to S3
+        run: |
+          if [ "${{ inputs.target }}" = "blue" ]; then
+            aws s3 sync apps/dashboard/out s3://${{ secrets.DASHBOARD_BLUE_BUCKET }} --delete
+          else
+            aws s3 sync apps/dashboard/out s3://${{ secrets.DASHBOARD_GREEN_BUCKET }} --delete
+          fi

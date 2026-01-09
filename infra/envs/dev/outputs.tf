@@ -1,5 +1,9 @@
-output "dashboard_bucket_name" {
-  value = aws_s3_bucket.dashboard.bucket
+output "dashboard_blue_bucket_name" {
+  value = aws_s3_bucket.dashboard_blue.bucket
+}
+
+output "dashboard_green_bucket_name" {
+  value = aws_s3_bucket.dashboard_green.bucket
 }
 
 output "cloudfront_domain_name" {

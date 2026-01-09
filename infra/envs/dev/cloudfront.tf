@@ -6,16 +6,29 @@ resource "aws_cloudfront_origin_access_control" "oac" {
   signing_protocol                  = "sigv4"
 }
 
+locals {
+  active_dashboard_origin_id = var.active_dashboard_color == "blue" ? "s3-dashboard-blue" : "s3-dashboard-green"
+}
+
 resource "aws_cloudfront_distribution" "cdn" {
   enabled             = true
   default_root_object = "index.html"
 
+  # Dashboard Blue Origin
   origin {
-    domain_name              = aws_s3_bucket.dashboard.bucket_regional_domain_name
-    origin_id                = "s3-dashboard"
+    domain_name              = aws_s3_bucket.dashboard_blue.bucket_regional_domain_name
+    origin_id                = "s3-dashboard-blue"
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
   }
 
+  # Dashboard Green Origin
+  origin {
+    domain_name              = aws_s3_bucket.dashboard_green.bucket_regional_domain_name
+    origin_id                = "s3-dashboard-green"
+    origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
+  }
+
+  # API Gateway Origin (unchanged)
   origin {
     domain_name = replace(aws_apigatewayv2_api.api.api_endpoint, "https://", "")
     origin_id   = "api-gateway"
@@ -28,8 +41,9 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
   }
 
+  # Default behavior serves the ACTIVE dashboard origin (blue/green)
   default_cache_behavior {
-    target_origin_id       = "s3-dashboard"
+    target_origin_id       = local.active_dashboard_origin_id
     viewer_protocol_policy = "redirect-to-https"
 
     allowed_methods = ["GET", "HEAD", "OPTIONS"]
@@ -43,6 +57,7 @@ resource "aws_cloudfront_distribution" "cdn" {
     }
   }
 
+  # /api/* behavior remains unchanged
   ordered_cache_behavior {
     path_pattern           = "/api/*"
     target_origin_id       = "api-gateway"
