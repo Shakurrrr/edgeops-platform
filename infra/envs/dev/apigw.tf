@@ -31,11 +31,10 @@ resource "aws_apigatewayv2_stage" "default" {
 resource "aws_lambda_permission" "apigw" {
   statement_id  = "AllowAPIGatewayInvoke"
   action        = "lambda:InvokeFunction"
-
-  # allow invoke on the alias itself
-  function_name = aws_lambda_alias.stable.arn
-
+  function_name = aws_lambda_function.api.function_name
+  qualifier     = aws_lambda_alias.stable.name
   principal     = "apigateway.amazonaws.com"
   source_arn    = "${aws_apigatewayv2_api.api.execution_arn}/*/*"
 }
+
 

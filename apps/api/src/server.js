@@ -21,16 +21,46 @@ function payload() {
     commit: COMMIT,
     environment: ENVIRONMENT,
     timestamp: new Date().toISOString(),
-    request_id: crypto.randomUUID()
+    request_id: crypto.randomUUID(),
   };
 }
 
+/**
+ * Structured logging helper (JSON logs for CloudWatch queryability)
+ */
+function logEvent(eventType, data) {
+  console.log(
+    JSON.stringify({
+      event_type: eventType,
+      ...data,
+    })
+  );
+}
+
 app.get("/api/health", (req, res) => {
-  res.status(200).json({ status: "ok", ...payload() });
+  const p = { status: "ok", ...payload() };
+
+  logEvent("api_health", {
+    path: req.path,
+    method: req.method,
+    user_agent: req.headers["user-agent"],
+    ...p,
+  });
+
+  res.status(200).json(p);
 });
 
 app.get("/api/version", (req, res) => {
-  res.status(200).json(payload());
+  const p = payload();
+
+  logEvent("api_version", {
+    path: req.path,
+    method: req.method,
+    user_agent: req.headers["user-agent"],
+    ...p,
+  });
+
+  res.status(200).json(p);
 });
 
 if (require.main === module) {

@@ -1,0 +1,41 @@
+name: Rollback Canary (Dev)
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: terraform-dev
+  cancel-in-progress: false
+
+jobs:
+  rollback:
+    runs-on: ubuntu-latest
+    environment: dev
+
+    defaults:
+      run:
+        working-directory: infra/envs/dev
+    
+    env:
+      TF_IN_AUTOMATION: true
+      TF_INPUT: false
+
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: us-east-1
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.7.5
+
+      - name: Terraform Init
+        run: terraform init -input=false
+
+      - name: Rollback canary (weight=0)
+        run: terraform apply -auto-approve -input=false -var="canary_weight=0.0"

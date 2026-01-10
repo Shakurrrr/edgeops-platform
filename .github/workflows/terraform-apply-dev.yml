@@ -2,40 +2,32 @@ name: Terraform Apply (Dev)
 
 on:
   push:
-    branches:
-      - main
-    paths:
-      - "infra/**"
+    branches: [ "main" ]
+    paths: [ "infra/**" ]
   workflow_dispatch:
+
+concurrency:
+  group: terraform-dev
+  cancel-in-progress: false
 
 jobs:
   terraform-apply:
     runs-on: ubuntu-latest
+    environment: dev
 
-    environment:
-      name: dev
+    defaults:
+      run:
+        working-directory: infra/envs/dev
+
+    env:
+      TF_IN_AUTOMATION: true   
+      TF_INPUT: false
 
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Debug secrets presence (safe)
-        shell: bash
-        run: |
-          if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
-            echo "AWS_ACCESS_KEY_ID is EMPTY"
-            exit 1
-          else
-            echo "AWS_ACCESS_KEY_ID is present"
-          fi
-
-          if [ -z "${{ secrets.AWS_SECRET_ACCESS_KEY }}" ]; then
-            echo "AWS_SECRET_ACCESS_KEY is EMPTY"
-            exit 1
-          else
-            echo "AWS_SECRET_ACCESS_KEY is present"
-          fi
-
+    
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -52,9 +44,10 @@ jobs:
           terraform_version: 1.7.5
 
       - name: Terraform Init
-        working-directory: infra/envs/dev
-        run: terraform init
+        run: terraform init -input=false
+
+      - name: Terraform Validate
+        run: terraform validate
 
       - name: Terraform Apply
-        working-directory: infra/envs/dev
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve -input=false
