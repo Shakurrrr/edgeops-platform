@@ -23,9 +23,7 @@ function Badge({ text }: { text: string }) {
 
   if (text === "stable") {
     return (
-      <span
-        className={`${base} bg-emerald-50 text-emerald-700 ring-emerald-600/20`}
-      >
+      <span className={`${base} bg-cyan-500/10 text-cyan-200 ring-cyan-400/20`}>
         STABLE
       </span>
     );
@@ -33,14 +31,16 @@ function Badge({ text }: { text: string }) {
 
   if (text === "canary") {
     return (
-      <span className={`${base} bg-amber-50 text-amber-800 ring-amber-600/20`}>
+      <span
+        className={`${base} bg-fuchsia-500/10 text-fuchsia-200 ring-fuchsia-400/20`}
+      >
         CANARY
       </span>
     );
   }
 
   return (
-    <span className={`${base} bg-gray-100 text-gray-700 ring-gray-300`}>
+    <span className={`${base} bg-white/5 text-white/70 ring-white/10`}>
       {text.toUpperCase()}
     </span>
   );
@@ -49,17 +49,18 @@ function Badge({ text }: { text: string }) {
 function StatusPill({ ok, text }: { ok: boolean; text: string }) {
   const base =
     "inline-flex items-center gap-2 rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset";
+
   return (
     <span
       className={
         ok
-          ? `${base} bg-emerald-50 text-emerald-700 ring-emerald-600/20`
-          : `${base} bg-red-50 text-red-700 ring-red-600/20`
+          ? `${base} bg-cyan-500/10 text-cyan-200 ring-cyan-400/20`
+          : `${base} bg-rose-500/10 text-rose-200 ring-rose-400/20`
       }
     >
       <span
         className={`h-1.5 w-1.5 rounded-full ${
-          ok ? "bg-emerald-500" : "bg-red-500"
+          ok ? "bg-cyan-300" : "bg-rose-300"
         }`}
       />
       {text}
@@ -69,46 +70,63 @@ function StatusPill({ ok, text }: { ok: boolean; text: string }) {
 
 function Chip({ label, value }: { label: string; value: React.ReactNode }) {
   return (
-    <div className="min-w-0 rounded-2xl border border-black/5 bg-white/70 px-4 py-3 shadow-sm">
-      <div className="truncate text-[11px] font-medium text-gray-500">
+    <div className="min-w-0 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 shadow-sm backdrop-blur-xl">
+      <div className="truncate text-[11px] font-medium text-white/50">
         {label}
       </div>
-      <div className="mt-1 text-sm font-semibold text-gray-900">{value}</div>
+      <div className="mt-1 text-sm font-semibold text-white">{value}</div>
     </div>
   );
 }
 
-/**
- * KV tile: prevents text/labels from overflowing the card.
- * - min-w-0 allows grid children to shrink
- * - overflow-hidden ensures nothing paints outside
- * - truncate label keeps headings inside tile
- * - break-words keeps values from pushing layout
- */
 function KV({ k, v }: { k: string; v?: React.ReactNode }) {
   return (
-    <div className="min-w-0 overflow-hidden rounded-2xl border border-black/5 bg-white/70 p-4">
-      <div className="truncate text-[11px] font-medium text-gray-500">{k}</div>
-      <div className="mt-1 break-words text-sm font-semibold text-gray-900">
+    <div className="min-w-0 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
+      <div className="truncate text-[11px] font-medium text-white/50">{k}</div>
+      <div className="mt-1 break-words text-sm font-semibold text-white">
         {v ?? "—"}
       </div>
     </div>
   );
 }
 
+function Button({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-xs font-medium text-white/80 hover:bg-white/10 hover:text-white transition"
+    >
+      {children}
+    </button>
+  );
+}
+
+function CodeBlock({ text }: { text: string }) {
+  return (
+    <pre className="overflow-auto rounded-2xl border border-white/10 bg-black/30 p-4 text-xs text-white/70">
+      <code>{text}</code>
+    </pre>
+  );
+}
+
 function Sidebar() {
   const item =
-    "flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-gray-600 hover:bg-white/70 hover:text-gray-900 transition";
+    "flex items-center gap-3 rounded-xl px-3 py-2 text-sm text-white/60 hover:bg-white/5 hover:text-white transition";
   const active =
-    "flex items-center gap-3 rounded-xl px-3 py-2 text-sm bg-white shadow-sm text-gray-900";
+    "flex items-center gap-3 rounded-xl px-3 py-2 text-sm bg-white/10 border border-white/10 text-white";
 
-  const Dot = () => <span className="h-2 w-2 rounded-full bg-gray-300" />;
+  const Dot = () => <span className="h-2 w-2 rounded-full bg-white/25" />;
 
   return (
-    <aside className="h-full w-[260px] shrink-0 rounded-3xl border border-black/5 bg-white/60 p-4 backdrop-blur shadow-[0_30px_80px_-60px_rgba(0,0,0,.35)]">
-      {/* Header + Profile Pic */}
+    <aside className="h-full w-[260px] shrink-0 rounded-3xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl shadow-[0_30px_80px_-60px_rgba(0,0,0,.75)]">
       <div className="flex items-center gap-3 px-2 py-2">
-        <div className="relative h-10 w-10 overflow-hidden rounded-2xl ring-1 ring-black/5 bg-white/70">
+        <div className="relative h-10 w-10 overflow-hidden rounded-2xl ring-1 ring-white/10 bg-white/[0.04]">
           <img
             src="/profile.png"
             alt="Profile"
@@ -117,14 +135,16 @@ function Sidebar() {
               (e.currentTarget as HTMLImageElement).style.display = "none";
             }}
           />
-          <div className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-gray-600">
+          <div className="absolute inset-0 flex items-center justify-center text-xs font-semibold text-white/70">
             SE
           </div>
         </div>
 
         <div>
-          <div className="text-sm font-semibold tracking-tight">EdgeOps</div>
-          <div className="text-xs text-gray-500">Dashboard</div>
+          <div className="text-sm font-semibold tracking-tight text-white">
+            EdgeOps
+          </div>
+          <div className="text-xs text-white/40">Dashboard</div>
         </div>
       </div>
 
@@ -135,13 +155,16 @@ function Sidebar() {
         <a className={item} href="#api">
           <Dot /> API
         </a>
+        <a className={item} href="#runbook">
+          <Dot /> Runbook
+        </a>
       </div>
 
-      <div className="mt-8 rounded-2xl border border-black/5 bg-white/70 p-3">
-        <div className="text-xs font-medium text-gray-500">Tip</div>
-        <div className="mt-1 text-xs text-gray-600">
+      <div className="mt-8 rounded-2xl border border-white/10 bg-white/[0.04] p-3 backdrop-blur-xl">
+        <div className="text-xs font-medium text-white/50">Tip</div>
+        <div className="mt-1 text-xs text-white/60">
           Validate canary by hitting{" "}
-          <span className="font-mono">/api/version</span>.
+          <span className="font-mono text-white/80">/api/version</span>.
         </div>
       </div>
     </aside>
@@ -153,47 +176,60 @@ export default function Home() {
   const [version, setVersion] = useState<ApiStatus | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Frontend (blue/green) marker fetched from the active CloudFront origin
   const [frontendColor, setFrontendColor] = useState<string>("unknown");
+  const [autoRefresh, setAutoRefresh] = useState<boolean>(true);
 
-  // Prod: leave NEXT_PUBLIC_API_BASE unset to call /api/* on same domain (CloudFront).
-  // Dev: set NEXT_PUBLIC_API_BASE=http://localhost:3001 in .env.local
   const apiBase = process.env.NEXT_PUBLIC_API_BASE || "";
+
+  async function loadAll() {
+    try {
+      setError(null);
+
+      const [hRes, vRes] = await Promise.all([
+        fetch(`${apiBase}/api/health`, { cache: "no-store" }),
+        fetch(`${apiBase}/api/version`, { cache: "no-store" }),
+      ]);
+
+      if (!hRes.ok) throw new Error(`Health failed: ${hRes.status}`);
+      if (!vRes.ok) throw new Error(`Version failed: ${vRes.status}`);
+
+      const h = (await hRes.json()) as ApiStatus;
+      const v = (await vRes.json()) as ApiStatus;
+
+      setHealth(h);
+      setVersion(v);
+    } catch (e: any) {
+      setError(e?.message || "Failed to fetch API");
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
 
-    async function load() {
-      try {
-        setError(null);
-
-        const [hRes, vRes] = await Promise.all([
-          fetch(`${apiBase}/api/health`, { cache: "no-store" }),
-          fetch(`${apiBase}/api/version`, { cache: "no-store" }),
-        ]);
-
-        if (!hRes.ok) throw new Error(`Health failed: ${hRes.status}`);
-        if (!vRes.ok) throw new Error(`Version failed: ${vRes.status}`);
-
-        const h = (await hRes.json()) as ApiStatus;
-        const v = (await vRes.json()) as ApiStatus;
-
-        if (!cancelled) {
-          setHealth(h);
-          setVersion(v);
-        }
-      } catch (e: any) {
-        if (!cancelled) setError(e?.message || "Failed to fetch API");
-      }
+    async function boot() {
+      if (cancelled) return;
+      await loadAll();
     }
 
-    load();
+    boot();
+
     return () => {
       cancelled = true;
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [apiBase]);
 
-  // Fetch frontend.json from the current (active) dashboard origin
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const t = setInterval(() => {
+      loadAll();
+    }, 8000);
+
+    return () => clearInterval(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoRefresh]);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -210,9 +246,7 @@ export default function Home() {
             color === "blue" || color === "green" ? color : "unknown"
           );
         }
-      } catch {
-        // keep unknown on failures
-      }
+      } catch {}
     }
 
     loadFrontendMarker();
@@ -232,7 +266,7 @@ export default function Home() {
   );
 
   const card =
-    "rounded-3xl border border-black/5 bg-white/70 backdrop-blur shadow-[0_20px_60px_-45px_rgba(0,0,0,.35)]";
+    "rounded-3xl border border-white/10 bg-white/[0.04] backdrop-blur-xl shadow-[0_20px_60px_-45px_rgba(0,0,0,.75)]";
 
   const healthOk =
     !error &&
@@ -244,71 +278,123 @@ export default function Home() {
       ? apiBase.replace(/^https?:\/\//, "") || "localhost"
       : "via CloudFront";
 
+  const cfBase =
+    typeof window !== "undefined"
+      ? `${window.location.protocol}//${window.location.host}`
+      : "";
+
+  const curlDirect = `curl ${cfBase}/api/version`;
+  const curlLoop = `for i in {1..25}; do curl -s ${cfBase}/api/version | jq -r '.deployment' ; done | sort | uniq -c`;
+
+  const whatThisProves = [
+    "Single edge entry point via CloudFront: / serves the dashboard; /api/* is routed to API Gateway → Lambda.",
+    "Progressive delivery visibility: /api/version returns deployment identity (stable/canary) + version + request id.",
+    "Blue/green frontend marker: frontend.json is served from the active S3 origin (blue or green).",
+    "Operations mindset: rollouts are validated under real HTTP traffic, not just ‘terraform apply’ screenshots.",
+  ];
+
+  const runbook = [
+    {
+      title: "Baseline checks",
+      items: [
+        "Open dashboard and confirm Environment + Frontend color.",
+        "Hit /api/health and confirm status is OK.",
+        "Hit /api/version and confirm deployment identity is visible.",
+      ],
+    },
+    {
+      title: "Canary validation",
+      items: [
+        "Set canary_weight (e.g. 0.1) and apply Terraform.",
+        "Refresh a few times and confirm some responses show CANARY.",
+        "If errors/latency spike, set canary_weight=0 and rollback.",
+      ],
+    },
+    {
+      title: "Blue/green frontend",
+      items: [
+        "Deploy build to inactive bucket (blue/green).",
+        "Flip active_dashboard_color and validate visual changes.",
+        "Rollback by switching active_dashboard_color back.",
+      ],
+    },
+  ];
+
   return (
-    // ✅ Forces full-viewport app shell regardless of any parent constraints
-    <div className="fixed inset-0 bg-[#efefef]">
-      <div className="h-full w-full p-6">
+    <div className="fixed inset-0 bg-[#070A12]">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-40 -left-40 h-[520px] w-[520px] rounded-full bg-indigo-500/20 blur-3xl" />
+        <div className="absolute top-1/3 -right-40 h-[520px] w-[520px] rounded-full bg-fuchsia-500/15 blur-3xl" />
+        <div className="absolute bottom-[-200px] left-1/3 h-[520px] w-[520px] rounded-full bg-cyan-500/10 blur-3xl" />
+      </div>
+
+      <div className="relative h-full w-full p-6">
         <div className="grid h-full gap-6 grid-cols-[260px_minmax(0,1fr)]">
           <Sidebar />
 
-          {/* ✅ Fill remaining height and scroll inside */}
-          <section className="h-full overflow-auto rounded-3xl border border-black/5 bg-white/40 p-8 shadow-[0_30px_80px_-60px_rgba(0,0,0,.35)]">
+          <section className="h-full overflow-auto rounded-3xl border border-white/10 bg-white/[0.04] p-8 backdrop-blur-xl shadow-[0_30px_80px_-60px_rgba(0,0,0,.75)]">
             <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div className="min-w-0">
-                <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
-                  EdgeOps <span className="text-gray-400">overview</span>
+                <h1 className="text-3xl font-semibold tracking-tight text-white">
+                  EdgeOps <span className="text-white/40">overview</span>
                 </h1>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm text-white/60">
                   Minimal console for environment + API health (Stable + Canary).
                 </p>
+
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <Button onClick={() => loadAll()}>Refresh</Button>
+                  <Button onClick={() => setAutoRefresh((v) => !v)}>
+                    Auto-refresh: {autoRefresh ? "ON" : "OFF"}
+                  </Button>
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard?.writeText(`${cfBase}/api/version`);
+                    }}
+                  >
+                    Copy /api/version
+                  </Button>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-3 md:justify-end">
-                <div className="w-[180px]">
+                <div className="w-[200px]">
                   <Chip label="Environment" value={env} />
                 </div>
 
-                <div className="w-[180px]">
+                <div className="w-[200px]">
                   <Chip
                     label="Frontend"
                     value={
                       frontendColor === "unknown" ? (
                         <StatusPill ok={false} text="UNKNOWN" />
                       ) : (
-                        <StatusPill
-                          ok={true}
-                          text={frontendColor.toUpperCase()}
-                        />
+                        <StatusPill ok={true} text={frontendColor.toUpperCase()} />
                       )
                     }
                   />
                 </div>
 
-                <div className="w-[180px]">
+                <div className="w-[200px]">
                   <Chip
                     label="API Deployment"
-                    value={
-                      deployment === "—" ? (
-                        "—"
-                      ) : (
-                        <Badge text={String(deployment)} />
-                      )
-                    }
+                    value={deployment === "—" ? "—" : <Badge text={String(deployment)} />}
                   />
                 </div>
               </div>
             </div>
 
-            <div className="mt-6 h-px w-full bg-black/5" />
+            <div className="mt-6 h-px w-full bg-white/10" />
 
+            {/* Top row: status cards */}
             <div id="api" className="mt-8 grid gap-6 lg:grid-cols-2">
               <div className={`${card} p-6`}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-gray-900">
+                    <div className="text-sm font-semibold text-white">
                       API Health
                     </div>
-                    <div className="mt-1 truncate text-xs text-gray-500">
+                    <div className="mt-1 truncate text-xs text-white/40">
                       {apiHostLabel}
                     </div>
                   </div>
@@ -326,13 +412,13 @@ export default function Home() {
                 </div>
 
                 {error && (
-                  <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+                  <div className="mt-4 rounded-2xl border border-rose-500/20 bg-rose-500/10 p-4 text-sm text-rose-200">
                     {error}
                   </div>
                 )}
 
                 {!error && !health && (
-                  <div className="mt-4 text-sm text-gray-500">
+                  <div className="mt-4 text-sm text-white/50">
                     Loading health status…
                   </div>
                 )}
@@ -345,7 +431,7 @@ export default function Home() {
                     <KV
                       k="Request ID"
                       v={
-                        <span className="font-mono text-xs break-all">
+                        <span className="font-mono text-xs break-all text-white/80">
                           {health.request_id || "—"}
                         </span>
                       }
@@ -357,10 +443,10 @@ export default function Home() {
               <div className={`${card} p-6`}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <div className="text-sm font-semibold text-gray-900">
+                    <div className="text-sm font-semibold text-white">
                       API Version
                     </div>
-                    <div className="mt-1 text-xs text-gray-500">Details</div>
+                    <div className="mt-1 text-xs text-white/40">Details</div>
                   </div>
                   {version?.deployment ? (
                     <Badge text={version.deployment} />
@@ -370,7 +456,7 @@ export default function Home() {
                 </div>
 
                 {!version && !error && (
-                  <div className="mt-4 text-sm text-gray-500">
+                  <div className="mt-4 text-sm text-white/50">
                     Loading version…
                   </div>
                 )}
@@ -392,7 +478,7 @@ export default function Home() {
                   <KV
                     k="Commit"
                     v={
-                      <span className="font-mono text-xs break-all">
+                      <span className="font-mono text-xs break-all text-white/80">
                         {version?.commit ?? "—"}
                       </span>
                     }
@@ -400,7 +486,7 @@ export default function Home() {
                   <KV
                     k="Timestamp"
                     v={
-                      <span className="font-mono text-xs break-all">
+                      <span className="font-mono text-xs break-all text-white/80">
                         {version?.timestamp ?? "—"}
                       </span>
                     }
@@ -409,7 +495,7 @@ export default function Home() {
                     <KV
                       k="Request ID"
                       v={
-                        <span className="font-mono text-xs break-all">
+                        <span className="font-mono text-xs break-all text-white/80">
                           {version?.request_id ?? "—"}
                         </span>
                       }
@@ -418,23 +504,138 @@ export default function Home() {
                 </div>
 
                 <details className="mt-4">
-                  <summary className="cursor-pointer select-none text-xs font-medium text-gray-600 hover:text-gray-900">
+                  <summary className="cursor-pointer select-none text-xs font-medium text-white/60 hover:text-white">
                     View raw JSON
                   </summary>
-                  <pre className="mt-3 max-h-[240px] overflow-auto rounded-2xl border border-black/5 bg-white/70 p-4 text-xs text-gray-700">
+                  <pre className="mt-3 max-h-[240px] overflow-auto rounded-2xl border border-white/10 bg-black/30 p-4 text-xs text-white/70">
                     {JSON.stringify(version ?? {}, null, 2)}
                   </pre>
                 </details>
               </div>
             </div>
 
-            <div className="mt-8 border-t border-black/5 pt-6 text-xs text-gray-500">
+            {/* New row: narrative + commands */}
+            <div className="mt-6 grid gap-6 xl:grid-cols-3">
+              <div className={`${card} p-6 xl:col-span-2`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-white">
+                      What this dashboard proves
+                    </div>
+                    <div className="mt-1 text-xs text-white/40">
+                      The “platform engineering” story in one screen.
+                    </div>
+                  </div>
+                  <Badge text={deployment === "—" ? "stable" : String(deployment)} />
+                </div>
+
+                <ul className="mt-4 space-y-3 text-sm text-white/70">
+                  {whatThisProves.map((x) => (
+                    <li key={x} className="flex gap-3">
+                      <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-cyan-300/70" />
+                      <span>{x}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="mt-5 rounded-2xl border border-white/10 bg-black/20 p-4 text-xs text-white/60">
+                  <span className="font-medium text-white/70">Signal design:</span>{" "}
+                  request_id is generated per request so you can verify traffic
+                  splitting under real HTTP load without guessing.
+                </div>
+              </div>
+
+              <div className={`${card} p-6`}>
+                <div className="text-sm font-semibold text-white">Quick actions</div>
+                <div className="mt-1 text-xs text-white/40">
+                  Copy/paste validation commands.
+                </div>
+
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <div className="text-xs font-medium text-white/60">
+                      Single request
+                    </div>
+                    <CodeBlock text={curlDirect} />
+                    <div className="mt-2">
+                      <Button
+                        onClick={() =>
+                          navigator.clipboard?.writeText(curlDirect)
+                        }
+                      >
+                        Copy command
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <div className="text-xs font-medium text-white/60">
+                      Sample 25 responses (requires jq)
+                    </div>
+                    <CodeBlock text={curlLoop} />
+                    <div className="mt-2">
+                      <Button
+                        onClick={() => navigator.clipboard?.writeText(curlLoop)}
+                      >
+                        Copy command
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Runbook */}
+            <div id="runbook" className="mt-6">
+              <div className={`${card} p-6`}>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-white">
+                      Runbook: validation checklist
+                    </div>
+                    <div className="mt-1 text-xs text-white/40">
+                      Use this during demos and rollouts.
+                    </div>
+                  </div>
+                  <StatusPill ok={!error} text={!error ? "Ready" : "Investigate"} />
+                </div>
+
+                <div className="mt-5 grid gap-6 lg:grid-cols-3">
+                  {runbook.map((section) => (
+                    <div
+                      key={section.title}
+                      className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"
+                    >
+                      <div className="text-xs font-semibold text-white">
+                        {section.title}
+                      </div>
+                      <ul className="mt-3 space-y-2 text-sm text-white/70">
+                        {section.items.map((i) => (
+                          <li key={i} className="flex gap-3">
+                            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-fuchsia-300/70" />
+                            <span>{i}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-6 border-t border-white/10 pt-4 text-xs text-white/50">
+                  Pro tip: Keep CloudFront <span className="font-mono">index.html</span>{" "}
+                  uncached and cache hashed assets long-term. That prevents “stale UI”
+                  during rollouts.
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 border-t border-white/10 pt-6 text-xs text-white/50">
               Powered by{" "}
-              <span className="font-medium text-gray-700">
+              <span className="font-medium text-white/70">
                 CloudFront + Lambda aliases
               </span>
               . Validate canary with{" "}
-              <code className="rounded border border-black/5 bg-white/70 px-1 py-0.5 text-gray-700">
+              <code className="rounded border border-white/10 bg-white/[0.04] px-1 py-0.5 text-white/70">
                 /api/version
               </code>
               .
