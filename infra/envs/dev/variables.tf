@@ -42,10 +42,12 @@ variable "stable_version" {
 }
 
 variable "canary_weight" {
-  description = "Percent of traffic routed to canary (0.0 - 1.0). Example: 0.1 = 10%"
+
   type        = number
+  description = "Traffic weight (0.0 - 1.0) routed to canary version."
   default     = 0.0
 }
+
 
 variable "active_dashboard_color" {
   description = "Which dashboard environment CloudFront should serve: blue or green"
@@ -67,4 +69,10 @@ variable "frontend_color" {
   type        = string
   description = "Frontend active color (blue|green) for dashboard."
   default     = "blue"
+}
+
+variable "canary_function_version" {
+  type        = string
+  description = "Numeric Lambda version to receive canary traffic (example: 6)"
+  default     = ""
 }
