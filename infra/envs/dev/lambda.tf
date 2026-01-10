@@ -30,7 +30,7 @@ resource "aws_lambda_alias" "stable" {
   function_name = aws_lambda_function.api.function_name
 
   # Stable points to pinned version 1
-  function_version = var.stable_version
+  function_version = aws_lambda_function.api.version
 
   # Route % of traffic to newest version (v2) = canary
   routing_config {

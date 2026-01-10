@@ -56,3 +56,15 @@ variable "active_dashboard_color" {
     error_message = "active_dashboard_color must be either 'blue' or 'green'"
   }
 }
+
+variable "canary_version" {
+  type        = string
+  description = "Semantic version string for canary (used only in Lambda env vars)."
+  default     = "v0.2.1-canary"
+}
+
+variable "frontend_color" {
+  type        = string
+  description = "Frontend active color (blue|green) for dashboard."
+  default     = "blue"
+}
