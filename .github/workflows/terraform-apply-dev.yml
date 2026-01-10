@@ -3,7 +3,7 @@ name: Terraform Apply (Dev)
 on:
   push:
     branches: [ "main" ]
-    paths: [ "infra/**" ]
+    paths: [ "infra/**", "apps/api/**", ".github/workflows/**" ]
   workflow_dispatch:
 
 concurrency:
@@ -15,19 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
 
-    defaults:
-      run:
-        working-directory: infra/envs/dev
-
-    env:
-      TF_IN_AUTOMATION: true   
-      TF_INPUT: false
-
+    
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-    
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -38,16 +30,38 @@ jobs:
       - name: Verify AWS identity
         run: aws sts get-caller-identity
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+
+      - name: Build Lambda artifact (api.zip)
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf dist
+          mkdir -p dist
+          cd apps/api
+          npm ci --omit=dev
+          zip -r ../../dist/api.zip . -x "node_modules/.cache/*" -x ".git/*"
+          cd ../..
+          ls -lah dist/api.zip
+
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.7.5
 
       - name: Terraform Init
+        working-directory: infra/envs/dev
         run: terraform init -input=false
 
       - name: Terraform Validate
+        working-directory: infra/envs/dev
         run: terraform validate
 
       - name: Terraform Apply
+        working-directory: infra/envs/dev
         run: terraform apply -auto-approve -input=false
