@@ -26,7 +26,7 @@ function payload() {
 }
 
 /**
- * Structured logging helper (JSON logs for CloudWatch queryability)
+ * Structured logging helper (JSON logs for CloudWatch queryability\ in JSON format).
  */
 function logEvent(eventType, data) {
   console.log(
